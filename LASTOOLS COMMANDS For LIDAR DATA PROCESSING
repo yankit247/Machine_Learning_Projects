@@ -1,0 +1,60 @@
+#
+set path=C:\LAStools\bin;%PATH%
+cd C:\LIDAR\New
+C:
+
+# tiling
+mkdir tiles_1_250
+lastile -i All_IITK_cloud_1.las -tile_size 250 -buffer 1 -odir tiles_1_250 -cpu64 -cores 15
+
+# thining 
+mkdir tiles_2_thin_250
+lasthin -i tiles_1_250\*.las -step 0.1 -odir tiles_2_thin_250 -cpu64 -cores 15
+
+# classify noise
+mkdir tiles_3_noise_250
+lasnoise -i tiles_2_thin_250\*.las -step 1 -isolated 6 -odix _denoised_st1_i6 -odir tiles_3_noise_250\ -cpu64 -cores 15
+
+#classify ground
+mkdir tiles_4_ground_250
+lasground -i tiles_3_noise_250\*.las  -all_returns -odix _default -odir tiles_4_ground_250\ -cpu64 -cores 15
+
+#classify height 
+mkdir tiles_5_height_250
+lasheight -i tiles_4_ground_250\*.las -odix _heig  -odir tiles_5_height_250\ -cpu64 -cores 15
+
+#classify the objects 
+mkdir tiles_6_classify_250
+lasclassify -i tiles_5_height_250\*.las -step 1 -odix _classi_st1 -odir tiles_6_classify_250\ -cpu64 -cores 15
+
+#joining the las files
+las2las -i tiles_6_classify_250\*.las -merged -keep_class 2 5 -o All_Vegetation_ground_merged.las
+
+#Generate a Digital Surface Model (DTM)
+blast2dem -i  All_Vegetation_ground_merged.las -keep_class 2 -step 0.1 -otif -o All_IITK_cloud_1_DTM.tif
+
+#Generate a Digital Terrain Model (DSM) 
+lasgrid -i All_Vegetation_ground_merged.las -keep_class 2 -step 0.1 -otif -o All_IITK_cloud_1_DSM.tif
+
+#Generate a Digital Elevation Model (DEM)
+blast2dem -i All_Vegetation_ground_merged.las -step 0.1 -otif -o All_IITK_cloud_1_DEM.tif
+
+lasgrid -i  All_Vegetation_ground_merged.las  -step 0.1 -elevation_highest -fill 5 -first_only -o All_Vegetation_ground_merged_DSM.tif
+
+blast2dem -i  All_Vegetation_ground_merged.las -last_only -step 0.1 -otif -keep_class 2 -o All_Vegetation_ground_merged_DTM.tif
+
+blast2dem -i All_Vegetation_ground_merged.las -step 0.1 -intensity -o All_intensity.tif
+
+
+
+# extra not used yet 
+las2dem -i height_points.las -intensity -o intensity_raster.tif
+lascanopy -i All_IITK_cloud_1_ground.las -step 1 -keep_class 2 -mean -max -min -std -percentile 90 -o output.txt
+
+
+lasnoise -i input.las -o denoised.las -step 1 -isolated 6 -cpu64 -cores 15
+lasground -i .las  -all_returns -odix _default -o.las -cpu64 -cores 15
+lasheight -i .las -odix _heig  -o.las -cpu64 -cores 15
+lasclassify -i.las -step 1 -odix _classi_st1 -o.las -cpu64 -cores 15
+
+
