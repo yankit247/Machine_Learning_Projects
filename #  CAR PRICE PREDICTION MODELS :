@@ -1,0 +1,278 @@
+#  CAR PRICE PREDICTION MODELS :
+
+
+# Linear and Lasso Regression Model:
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Lasso
+from sklearn import metrics
+
+# loading the data from csv file to pandas dataframe
+car_dataset = pd.read_csv('/content/car data.csv')
+
+# inspecting the first 5 rows of the dataframe
+car_dataset.head()
+
+# checking the number of rows and columns
+car_dataset.shape
+
+# getting some information about the dataset
+car_dataset.info()
+
+# checking the number of missing values
+car_dataset.isnull().sum()
+
+# checking the distribution of categorical data
+print(car_dataset.Fuel_Type.value_counts())
+print(car_dataset.Seller_Type.value_counts())
+print(car_dataset.Transmission.value_counts())
+
+# encoding "Fuel_Type" Column
+car_dataset.replace({'Fuel_Type':{'Petrol':0,'Diesel':1,'CNG':2}},inplace=True)
+
+# encoding "Seller_Type" Column
+car_dataset.replace({'Seller_Type':{'Dealer':0,'Individual':1}},inplace=True)
+
+# encoding "Transmission" Column
+car_dataset.replace({'Transmission':{'Manual':0,'Automatic':1}},inplace=True)
+
+car_dataset.head()
+
+X = car_dataset.drop(['Car_Name','Selling_Price'],axis=1)
+Y = car_dataset['Selling_Price']
+print(X)
+print(Y)
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = 0.1, random_state=2)
+
+# loading the linear regression model
+lin_reg_model = LinearRegression()
+lin_reg_model.fit(X_train,Y_train)
+
+# prediction on Training data
+training_data_prediction = lin_reg_model.predict(X_train)
+
+# R squared Error
+error_score = metrics.r2_score(Y_train, training_data_prediction)
+print("R squared Error : ", error_score)
+
+plt.scatter(Y_train, training_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title(" Actual Prices vs Predicted Prices")
+plt.show()
+
+# prediction on Testing data
+test_data_prediction = lin_reg_model.predict(X_test)
+# R squared Error
+error_score = metrics.r2_score(Y_test, test_data_prediction)
+print("R squared Error : ", error_score)
+plt.scatter(Y_test, test_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title(" Actual Prices vs Predicted Prices")
+plt.show()
+
+# loading the lasso regression model
+lass_reg_model = Lasso()
+
+# prediction on Training data
+training_data_prediction = lass_reg_model.predict(X_train)
+
+# R squared Error
+error_score = metrics.r2_score(Y_train, training_data_prediction)
+print("R squared Error : ", error_score)
+plt.scatter(Y_train, training_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title(" Actual Prices vs Predicted Prices")
+plt.show()
+
+# prediction on Training data
+test_data_prediction = lass_reg_model.predict(X_test)
+
+# R squared Error
+error_score = metrics.r2_score(Y_test, test_data_prediction)
+print("R squared Error : ", error_score)
+plt.scatter(Y_test, test_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title(" Actual Prices vs Predicted Prices")
+plt.show()
+
+# RANDOM FOREST
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn import metrics
+
+# Loading the data from csv file to pandas dataframe
+car_dataset = pd.read_csv('/content/car data.csv')
+
+# Encoding categorical columns
+car_dataset = pd.get_dummies(car_dataset, columns=['Fuel_Type', 'Seller_Type', 'Transmission'])
+
+# Splitting the data into input features (X) and target variable (Y)
+X = car_dataset.drop(['Car_Name', 'Selling_Price'], axis=1)
+Y = car_dataset['Selling_Price']
+
+# Splitting the data into training and testing sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Loading the Random Forest Regression model
+rf_model = RandomForestRegressor()
+
+# Training the model
+rf_model.fit(X_train, Y_train)
+
+# Prediction on Training data
+training_data_prediction = rf_model.predict(X_train)
+
+# R-squared Error on Training data
+training_error = metrics.r2_score(Y_train, training_data_prediction)
+print("R-squared Error on Training data: ", training_error)
+
+# Scatter plot of Actual Prices vs Predicted Prices for Training data
+plt.scatter(Y_train, training_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual Prices vs Predicted Prices (Training Data)")
+plt.show()
+
+# Prediction on Testing data
+test_data_prediction = rf_model.predict(X_test)
+
+# R-squared Error on Testing data
+testing_error = metrics.r2_score(Y_test, test_data_prediction)
+print("R-squared Error on Testing data: ", testing_error)
+
+# Scatter plot of Actual Prices vs Predicted Prices for Testing data
+plt.scatter(Y_test, test_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual Prices vs Predicted Prices (Testing Data)")
+plt.show()
+
+
+# GRADIENT BOSSTING REGRESSOR 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn import metrics
+
+# Loading the data from csv file to pandas dataframe
+car_dataset = pd.read_csv('/content/car data.csv')
+
+# Encoding categorical columns
+car_dataset = pd.get_dummies(car_dataset, columns=['Fuel_Type', 'Seller_Type', 'Transmission'])
+
+# Splitting the data into input features (X) and target variable (Y)
+X = car_dataset.drop(['Car_Name', 'Selling_Price'], axis=1)
+Y = car_dataset['Selling_Price']
+
+# Splitting the data into training and testing sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=2)
+
+# Loading the Gradient Boosting Regression model
+gb_model = GradientBoostingRegressor()
+
+# Training the model
+gb_model.fit(X_train, Y_train)
+
+# Prediction on Training data
+training_data_prediction = gb_model.predict(X_train)
+
+# R-squared Error on Training data
+training_error = metrics.r2_score(Y_train, training_data_prediction)
+print("R-squared Error on Training data: ", training_error)
+
+# Scatter plot of Actual Prices vs Predicted Prices for Training data
+plt.scatter(Y_train, training_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual Prices vs Predicted Prices (Training Data)")
+plt.show()
+
+# Prediction on Testing data
+test_data_prediction = gb_model.predict(X_test)
+
+# R-squared Error on Testing data
+testing_error = metrics.r2_score(Y_test, test_data_prediction)
+print("R-squared Error on Testing data: ", testing_error)
+
+# Scatter plot of Actual Prices vs Predicted Prices for Testing data
+plt.scatter(Y_test, test_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual Prices vs Predicted Prices (Testing Data)")
+plt.show()
+
+# SUPPORT VECTOR MACHINE 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVR
+from sklearn.preprocessing import StandardScaler
+from sklearn import metrics
+
+# Loading the data from csv file to pandas dataframe
+car_dataset = pd.read_csv('/content/car data.csv')
+
+# Encoding categorical columns
+car_dataset = pd.get_dummies(car_dataset, columns=['Fuel_Type', 'Seller_Type', 'Transmission'])
+
+# Splitting the data into input features (X) and target variable (Y)
+X = car_dataset.drop(['Car_Name', 'Selling_Price'], axis=1)
+Y = car_dataset['Selling_Price']
+
+# Splitting the data into training and testing sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.1, random_state=2)
+
+# Feature scaling using StandardScaler
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Loading the SVR model
+svr_model = SVR()
+
+# Training the model
+svr_model.fit(X_train_scaled, Y_train)
+
+# Prediction on Training data
+training_data_prediction = svr_model.predict(X_train_scaled)
+
+# R-squared Error on Training data
+training_error = metrics.r2_score(Y_train, training_data_prediction)
+print("R-squared Error on Training data: ", training_error)
+
+# Scatter plot of Actual Prices vs Predicted Prices for Training data
+plt.scatter(Y_train, training_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual Prices vs Predicted Prices (Training Data)")
+plt.show()
+
+# Prediction on Testing data
+test_data_prediction = svr_model.predict(X_test_scaled)
+
+# R-squared Error on Testing data
+testing_error = metrics.r2_score(Y_test, test_data_prediction)
+print("R-squared Error on Testing data: ", testing_error)
+
+# Scatter plot of Actual Prices vs Predicted Prices for Testing data
+plt.scatter(Y_test, test_data_prediction)
+plt.xlabel("Actual Price")
+plt.ylabel("Predicted Price")
+plt.title("Actual Prices vs Predicted Prices (Testing Data)")
+plt.show()
+
